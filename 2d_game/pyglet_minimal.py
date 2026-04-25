@@ -16,6 +16,8 @@ GRID_COLS = 24
 GRID_ROWS = 20
 GRID_OFFSET_X = (WINDOW_WIDTH - GRID_COLS * CELL_SIZE) // 2
 GRID_OFFSET_Y = 70
+INITIAL_SNAKE_LENGTH = 3
+WIN_SCORE = GRID_COLS * GRID_ROWS - INITIAL_SNAKE_LENGTH
 
 # Game tuning.
 GAME_TICK_SECONDS = 0.2
@@ -55,6 +57,7 @@ class SnakeGame:
 
         self.score = 0
         self.game_over = False
+        self.game_won = False
         self.paused = False
 
         # Direction vectors are grid steps per tick.
@@ -95,6 +98,7 @@ class SnakeGame:
         self.pending_direction = (1, 0)
         self.score = 0
         self.game_over = False
+        self.game_won = False
         self.paused = False
         self.spawn_food()
 
@@ -183,6 +187,10 @@ class SnakeGame:
         # Eat food to grow, otherwise move by removing tail.
         if next_head == self.food:
             self.score += 1
+            if self.score >= WIN_SCORE:
+                self.game_over = True
+                self.game_won = True
+                return
             self.spawn_food()
         else:
             self.snake.popleft()
@@ -276,7 +284,11 @@ class SnakeGame:
         self.score_label.text = f"Score: {self.score}"
         self.score_label.draw()
 
-        if self.game_over:
+        if self.game_over and self.game_won:
+            self.info_label.text = (
+                "You Win - press SPACE or DIPPID button_1 to restart"
+            )
+        elif self.game_over:
             self.info_label.text = (
                 "Game Over - press SPACE or DIPPID button_1 to restart"
             )
